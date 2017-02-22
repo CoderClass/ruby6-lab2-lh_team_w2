@@ -1,14 +1,21 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
-  helper_method :current_user, :signed_in?
+  helper_method :current_user, :signed_in?, :require_login
+
+  def skip_if_logged_in
+    !require_login
+  end
+
+  def require_login
+    if !signed_in?
+      flash[:notice] = "You must signed in to see this page"
+      redirect_to login_path
+    end
+  end
 
   def signed_in?
-    if session[:user_id]
-      return true
-    else
-      return false
-    end
+    current_user
   end
 
   def current_user
